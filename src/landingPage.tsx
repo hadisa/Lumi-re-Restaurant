@@ -79,6 +79,7 @@ export default function App() {
   const currentFrameRef = useRef(0);
   const targetFrameRef  = useRef(0);
   const rafRef          = useRef(null);
+  const firstFrameDrawnRef = useRef(false);
 
   const [loadProgress,  setLoadProgress]  = useState(0);
   const [loaded,        setLoaded]        = useState(false);
@@ -89,55 +90,125 @@ export default function App() {
 
   useReveal();
 
-  // ── Preload ───────────────────────────────────────────────────────────────
-  useEffect(() => {
-    const images = Array.from({ length: TOTAL_FRAMES }, () => new Image());
-    framesRef.current = images;
-    const loadFrame = (i) => new Promise((res) => {
-      const img = images[i];
-      const done = () => {
-        loadedCountRef.current++;
-        setLoadProgress(Math.round((loadedCountRef.current / TOTAL_FRAMES) * 100));
-        if (loadedCountRef.current === TOTAL_FRAMES) setLoaded(true);
-        res();
-      };
-      img.onload = done; img.onerror = done;
-      img.src = framePath(FRAME_START + i);
-    });
-    const heroCount = 49;
-    Promise.all(Array.from({ length: heroCount }, (_, i) => loadFrame(i))).then(() =>
-      Array.from({ length: TOTAL_FRAMES - heroCount }, (_, i) => loadFrame(heroCount + i))
-    );
+  // Function to draw a specific frame
+  const drawSpecificFrame = useCallback((img, canvas) => {
+    if (!img?.complete || !img.naturalWidth || !canvas) return false;
+    
+    const ctx = canvas.getContext("2d");
+    const { width: cw, height: ch } = canvas;
+    
+    // Only draw if canvas has dimensions
+    if (cw === 0 || ch === 0) return false;
+    
+    const ir = img.naturalWidth / img.naturalHeight;
+    const cr = cw / ch;
+    let dw, dh, dx, dy;
+    
+    if (ir > cr) { 
+      dh = ch; 
+      dw = ch * ir; 
+      dx = (cw - dw) / 2; 
+      dy = 0; 
+    } else { 
+      dw = cw; 
+      dh = cw / ir; 
+      dx = 0; 
+      dy = (ch - dh) / 2; 
+    }
+    
+    ctx.clearRect(0, 0, cw, ch);
+    ctx.drawImage(img, dx, dy, dw, dh);
+    
+    // Overlay effects
+    ctx.fillStyle = "rgba(3,1,0,0.62)"; 
+    ctx.fillRect(0, 0, cw, ch);
+    
+    const radial = ctx.createRadialGradient(cw / 2, ch / 2, cw * 0.2, cw / 2, ch / 2, cw * 0.9);
+    radial.addColorStop(0, "rgba(0,0,0,0)"); 
+    radial.addColorStop(1, "rgba(0,0,0,0.58)");
+    ctx.fillStyle = radial; 
+    ctx.fillRect(0, 0, cw, ch);
+    
+    const btm = ctx.createLinearGradient(0, ch * 0.35, 0, ch);
+    btm.addColorStop(0, "rgba(0,0,0,0)"); 
+    btm.addColorStop(1, "rgba(3,1,0,0.65)");
+    ctx.fillStyle = btm; 
+    ctx.fillRect(0, 0, cw, ch);
+    
+    return true;
   }, []);
 
   // ── Draw ──────────────────────────────────────────────────────────────────
   const drawFrame = useCallback((idx) => {
     const canvas = canvasRef.current; if (!canvas) return;
-    const ctx = canvas.getContext("2d");
     const img = framesRef.current[idx];
-    if (!img?.complete || !img.naturalWidth) return;
-    const { width: cw, height: ch } = canvas;
-    const ir = img.naturalWidth / img.naturalHeight, cr = cw / ch;
-    let dw, dh, dx, dy;
-    if (ir > cr) { dh = ch; dw = ch * ir; dx = (cw - dw) / 2; dy = 0; }
-    else          { dw = cw; dh = cw / ir; dx = 0; dy = (ch - dh) / 2; }
-    ctx.clearRect(0, 0, cw, ch);
-    ctx.drawImage(img, dx, dy, dw, dh);
-    // ★ STRONG multi-layer dark overlay
-    ctx.fillStyle = "rgba(3,1,0,0.62)"; ctx.fillRect(0, 0, cw, ch);
-    const radial = ctx.createRadialGradient(cw / 2, ch / 2, cw * 0.2, cw / 2, ch / 2, cw * 0.9);
-    radial.addColorStop(0, "rgba(0,0,0,0)"); radial.addColorStop(1, "rgba(0,0,0,0.58)");
-    ctx.fillStyle = radial; ctx.fillRect(0, 0, cw, ch);
-    const btm = ctx.createLinearGradient(0, ch * 0.35, 0, ch);
-    btm.addColorStop(0, "rgba(0,0,0,0)"); btm.addColorStop(1, "rgba(3,1,0,0.65)");
-    ctx.fillStyle = btm; ctx.fillRect(0, 0, cw, ch);
-  }, []);
+    drawSpecificFrame(img, canvas);
+  }, [drawSpecificFrame]);
+
+  // ── Preload ───────────────────────────────────────────────────────────────
+  useEffect(() => {
+    const images = Array.from({ length: TOTAL_FRAMES }, () => new Image());
+    framesRef.current = images;
+    
+    // Set canvas dimensions immediately
+    if (canvasRef.current) {
+      canvasRef.current.width = window.innerWidth;
+      canvasRef.current.height = window.innerHeight;
+    }
+    
+    const loadFrame = (i) => new Promise((res) => {
+      const img = images[i];
+      const done = () => {
+        loadedCountRef.current++;
+        setLoadProgress(Math.round((loadedCountRef.current / TOTAL_FRAMES) * 100));
+        
+        // Show first frame as soon as it's loaded and canvas is ready
+        if (loadedCountRef.current === 1 && !firstFrameDrawnRef.current) {
+          // First frame (frame_072.webp) just loaded - show it immediately
+          currentFrameRef.current = 0;
+          targetFrameRef.current = 0;
+          
+          // Try to draw immediately
+          if (canvasRef.current) {
+            const success = drawSpecificFrame(img, canvasRef.current);
+            if (success) {
+              firstFrameDrawnRef.current = true;
+            } else {
+              // If canvas not ready, retry after a short delay
+              setTimeout(() => {
+                if (canvasRef.current && !firstFrameDrawnRef.current) {
+                  const retrySuccess = drawSpecificFrame(img, canvasRef.current);
+                  if (retrySuccess) {
+                    firstFrameDrawnRef.current = true;
+                  }
+                }
+              }, 50);
+            }
+          }
+        }
+        
+        if (loadedCountRef.current === TOTAL_FRAMES) setLoaded(true);
+        res();
+      };
+      img.onload = done; 
+      img.onerror = done;
+      img.src = framePath(FRAME_START + i);
+    });
+    
+    const heroCount = 49;
+    Promise.all(Array.from({ length: heroCount }, (_, i) => loadFrame(i))).then(() =>
+      Array.from({ length: TOTAL_FRAMES - heroCount }, (_, i) => loadFrame(heroCount + i))
+    );
+  }, [drawSpecificFrame]);
 
   // ── RAF easing ────────────────────────────────────────────────────────────
   useEffect(() => {
     const loop = () => {
       const diff = targetFrameRef.current - currentFrameRef.current;
-      if (Math.abs(diff) > 0.05) { currentFrameRef.current += diff * 0.10; drawFrame(Math.round(currentFrameRef.current)); }
+      if (Math.abs(diff) > 0.05) { 
+        currentFrameRef.current += diff * 0.10; 
+        drawFrame(Math.round(currentFrameRef.current)); 
+      }
       rafRef.current = requestAnimationFrame(loop);
     };
     rafRef.current = requestAnimationFrame(loop);
@@ -148,10 +219,18 @@ export default function App() {
   useEffect(() => {
     const resize = () => {
       const c = canvasRef.current; if (!c) return;
-      c.width = window.innerWidth; c.height = window.innerHeight;
-      drawFrame(Math.round(currentFrameRef.current));
+      c.width = window.innerWidth;
+      c.height = window.innerHeight;
+      
+      // Redraw current frame after resize
+      if (framesRef.current[currentFrameRef.current]) {
+        drawFrame(Math.round(currentFrameRef.current));
+      }
     };
+    
+    // Call resize immediately
     resize();
+    
     window.addEventListener("resize", resize);
     return () => window.removeEventListener("resize", resize);
   }, [drawFrame]);
@@ -265,16 +344,8 @@ export default function App() {
       {/* ══════════════ FIXED CANVAS ══════════════ */}
       <canvas
         ref={canvasRef}
-        className={`fixed top-0 left-0 w-screen h-screen z-0 transition-opacity duration-[1200ms] ${loaded ? "opacity-100" : "opacity-0"}`}
+        className="fixed top-0 left-0 w-screen h-screen z-0 opacity-100"
       />
-
-      {/* ══════════════ PERSISTENT DARK OVERLAYS ══════════════ */}
-      {/* Layer 1: base dim */}
-      {/* <div className="fixed inset-0 z-[1] bg-[rgba(3,1,0,0.52)] pointer-events-none" /> */}
-      {/* Layer 2: radial vignette */}
-      {/* <div className="fixed inset-0 z-[2] pointer-events-none" style={{ background: "radial-gradient(ellipse at 50% 42%, transparent 28%, rgba(0,0,0,0.70) 100%)" }} /> */}
-      {/* Layer 3: film grain */}
-      {/* <div className="fixed inset-0 z-[3] opacity-60 pointer-events-none" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.03'/%3E%3C/svg%3E")` }} /> */}
 
       {/* ══════════════ NAVIGATION ══════════════ */}
       <nav className="fixed top-0 left-0 right-0 z-[200] px-14 py-6 flex items-center justify-between" style={{ background: "linear-gradient(to bottom, rgba(3,1,0,0.90) 0%, transparent 100%)" }}>
