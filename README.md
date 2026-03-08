@@ -1,6 +1,18 @@
 # ✦ Lumière — Cinematic Restaurant Landing Page
 
-> *A luxury restaurant experience built with React, Vite, and Tailwind CSS — powered by scroll-controlled WebP frame morphing on HTML Canvas.*
+> _A luxury restaurant experience built with React, Vite, and Tailwind CSS — powered by scroll-controlled WebP frame morphing on HTML Canvas._
+
+## 🎬 Full Tutorial
+
+<p align="center">
+
+### 🔴 **Watch the Complete Build Tutorial**
+
+👉 **https://youtu.be/04RzB3f7zq4**
+
+Learn how to build this **cinematic scroll-controlled frame animation website** step-by-step using **React, Vite, Tailwind, and Canvas API**.
+
+</p>
 
 <br />
 
@@ -40,9 +52,10 @@
 
 The design philosophy is rooted in a single idea:
 
-> *"A luxury restaurant website should feel like entering the restaurant itself — not clicking through one."*
+> _"A luxury restaurant website should feel like entering the restaurant itself — not clicking through one."_
 
 **Key highlights:**
+
 - 173 WebP frames rendered on `<canvas>` via `requestAnimationFrame`
 - Smooth easing via lerp interpolation (not linear scrubbing)
 - Three-layer persistent dark overlay system ensuring text readability on any frame
@@ -56,17 +69,17 @@ The design philosophy is rooted in a single idea:
 
 ## 🗂 Live Demo Sections
 
-| # | Section | Description |
-|---|---------|-------------|
-| 01 | **Hero** | Cinematic opener with animated headline and dual CTAs |
-| 02 | **Our Story** | Brand philosophy, stats, and chef quote panel |
-| 03 | **Awards & Recognition** | Michelin stars, World's 50 Best, Forbes, Wine Spectator |
-| 04 | **Meet the Chef** | Biography, training, and philosophy of Chef Élise Moreau |
-| 05 | **Signature Dishes** | Six-item tasting menu with corner-bracket cards |
-| 06 | **Wine Cellar** | Tabbed wine list (Burgundy / Bordeaux / Champagne / Natural) |
-| 07 | **Private Dining** | Six bespoke private experience offerings |
-| 08 | **Press & Testimonials** | Media quotes and guest reviews with star ratings |
-| 09 | **Reservation** | Full booking form with experience selector |
+| #   | Section                  | Description                                                  |
+| --- | ------------------------ | ------------------------------------------------------------ |
+| 01  | **Hero**                 | Cinematic opener with animated headline and dual CTAs        |
+| 02  | **Our Story**            | Brand philosophy, stats, and chef quote panel                |
+| 03  | **Awards & Recognition** | Michelin stars, World's 50 Best, Forbes, Wine Spectator      |
+| 04  | **Meet the Chef**        | Biography, training, and philosophy of Chef Élise Moreau     |
+| 05  | **Signature Dishes**     | Six-item tasting menu with corner-bracket cards              |
+| 06  | **Wine Cellar**          | Tabbed wine list (Burgundy / Bordeaux / Champagne / Natural) |
+| 07  | **Private Dining**       | Six bespoke private experience offerings                     |
+| 08  | **Press & Testimonials** | Media quotes and guest reviews with star ratings             |
+| 09  | **Reservation**          | Full booking form with experience selector                   |
 
 <br />
 
@@ -74,15 +87,15 @@ The design philosophy is rooted in a single idea:
 
 ## 🛠 Tech Stack
 
-| Technology | Version | Purpose |
-|------------|---------|---------|
-| [React](https://react.dev) | 18+ | UI framework and component architecture |
-| [Vite](https://vitejs.dev) | 5+ | Build tool, dev server, HMR |
-| [Tailwind CSS](https://tailwindcss.com) | 3+ | Utility-first styling — all layout, color, spacing |
-| HTML Canvas API | Native | Frame-by-frame WebP rendering |
-| `requestAnimationFrame` | Native | 60fps easing loop |
-| Intersection Observer API | Native | Scroll-triggered reveal animations |
-| [Google Fonts](https://fonts.google.com) | CDN | Cormorant Garamond + Josefin Sans |
+| Technology                               | Version | Purpose                                            |
+| ---------------------------------------- | ------- | -------------------------------------------------- |
+| [React](https://react.dev)               | 18+     | UI framework and component architecture            |
+| [Vite](https://vitejs.dev)               | 5+      | Build tool, dev server, HMR                        |
+| [Tailwind CSS](https://tailwindcss.com)  | 3+      | Utility-first styling — all layout, color, spacing |
+| HTML Canvas API                          | Native  | Frame-by-frame WebP rendering                      |
+| `requestAnimationFrame`                  | Native  | 60fps easing loop                                  |
+| Intersection Observer API                | Native  | Scroll-triggered reveal animations                 |
+| [Google Fonts](https://fonts.google.com) | CDN     | Cormorant Garamond + Josefin Sans                  |
 
 <br />
 
@@ -134,7 +147,7 @@ Make sure you have the following installed:
 **Step 1 — Clone or download the project**
 
 ```bash
-git clone https://github.com/yourusername/lumiere.git
+git clone https://github.com/hadisa/Lumi-re-Restaurant.git
 cd lumiere
 ```
 
@@ -198,7 +211,8 @@ Promise.all(heroFrames).then(() => loadRemainingFrames());
 As the user scrolls, the scroll position is mapped linearly to a frame index:
 
 ```js
-const progress = window.scrollY / (document.body.scrollHeight - window.innerHeight);
+const progress =
+  window.scrollY / (document.body.scrollHeight - window.innerHeight);
 targetFrame = Math.round(progress * (TOTAL_FRAMES - 1)); // 0 → 172
 ```
 
@@ -208,7 +222,7 @@ Rather than snapping directly to the target frame, the current frame value eases
 
 ```js
 // In requestAnimationFrame loop
-currentFrame += (targetFrame - currentFrame) * 0.10;
+currentFrame += (targetFrame - currentFrame) * 0.1;
 canvas.drawFrame(Math.round(currentFrame));
 ```
 
@@ -234,8 +248,8 @@ const framePath = (n) => `public/frames/frame_${pad(n)}_delay-0.04s.webp`;
 To change the frame range, update the constants at the top of `App.jsx`:
 
 ```js
-const FRAME_START  = 72;   // First frame number
-const FRAME_END    = 244;  // Last frame number
+const FRAME_START = 72; // First frame number
+const FRAME_END = 244; // Last frame number
 const TOTAL_FRAMES = FRAME_END - FRAME_START + 1; // 173 frames
 ```
 
@@ -243,14 +257,14 @@ const TOTAL_FRAMES = FRAME_END - FRAME_START + 1; // 173 frames
 
 To ensure text is always readable regardless of which frame is playing, three overlay layers are applied:
 
-| Layer | Type | Opacity | Purpose |
-|-------|------|---------|---------|
-| Canvas Layer 1 | Flat fill `rgba(3,1,0,0.62)` | 62% | Base darkness applied directly on canvas |
-| Canvas Layer 2 | Radial gradient | 0→58% | Darkens edges, keeps center lighter |
-| Canvas Layer 3 | Bottom linear gradient | 0→65% | Ensures text near bottom always readable |
-| Fixed Div (z:1) | `bg-[rgba(3,1,0,0.52)]` | 52% | Persistent global dim over all frames |
-| Fixed Div (z:2) | Radial CSS gradient | 0→70% | CSS vignette layer |
-| Fixed Div (z:3) | Film grain SVG texture | 30% | Cinematic grain overlay |
+| Layer           | Type                         | Opacity | Purpose                                  |
+| --------------- | ---------------------------- | ------- | ---------------------------------------- |
+| Canvas Layer 1  | Flat fill `rgba(3,1,0,0.62)` | 62%     | Base darkness applied directly on canvas |
+| Canvas Layer 2  | Radial gradient              | 0→58%   | Darkens edges, keeps center lighter      |
+| Canvas Layer 3  | Bottom linear gradient       | 0→65%   | Ensures text near bottom always readable |
+| Fixed Div (z:1) | `bg-[rgba(3,1,0,0.52)]`      | 52%     | Persistent global dim over all frames    |
+| Fixed Div (z:2) | Radial CSS gradient          | 0→70%   | CSS vignette layer                       |
+| Fixed Div (z:3) | Film grain SVG texture       | 30%     | Cinematic grain overlay                  |
 
 <br />
 
@@ -281,14 +295,14 @@ JPG also **does not support transparency**, which limits compositional flexibili
 
 WebP, developed by Google, combines the best of both formats:
 
-| Feature | PNG | JPG | WebP |
-|---------|-----|-----|------|
-| Transparency (alpha) | ✅ | ❌ | ✅ |
-| Lossless mode | ✅ | ❌ | ✅ |
-| Lossy mode | ❌ | ✅ | ✅ |
-| File size (typical) | Large | Medium | **Small** |
-| Quality at same size | High | Medium | **High** |
-| Animation support | ❌ | ❌ | ✅ |
+| Feature              | PNG   | JPG    | WebP      |
+| -------------------- | ----- | ------ | --------- |
+| Transparency (alpha) | ✅    | ❌     | ✅        |
+| Lossless mode        | ✅    | ❌     | ✅        |
+| Lossy mode           | ❌    | ✅     | ✅        |
+| File size (typical)  | Large | Medium | **Small** |
+| Quality at same size | High  | Medium | **High**  |
+| Animation support    | ❌    | ❌     | ✅        |
 
 **The result for this project:**
 
@@ -319,6 +333,7 @@ Navigate to [https://ezgif.com/split](https://ezgif.com/split) or use the **GIF 
 **Step 2 — Upload your animation**
 
 You can upload:
+
 - An animated GIF
 - An MP4 video clip
 - An existing WebP animation
@@ -330,6 +345,7 @@ Click **Split** — ezgif will extract every individual frame as a separate imag
 **Step 4 — Convert to WebP**
 
 This is the critical step most people skip:
+
 - Select all frames
 - Use the **Convert to WebP** option
 - Set quality to `85` (balances size and quality perfectly)
@@ -380,8 +396,8 @@ lumiere/public/frames/frame_073_delay-0.04s.webp
 If your sequence starts or ends at different numbers, update `App.jsx`:
 
 ```js
-const FRAME_START = 72;   // Change to your first frame number
-const FRAME_END   = 244;  // Change to your last frame number
+const FRAME_START = 72; // Change to your first frame number
+const FRAME_END = 244; // Change to your last frame number
 ```
 
 <br />
@@ -397,15 +413,12 @@ This project uses standard Tailwind CSS v3 with no custom plugins required. Howe
 ```js
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: [
-    "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}",
-  ],
+  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {},
   },
   plugins: [],
-}
+};
 ```
 
 ### Required `src/index.css`
@@ -421,7 +434,7 @@ export default {
 Fonts are loaded via Google Fonts CDN inside a `<style>` tag in `App.jsx`. No additional configuration is needed:
 
 ```css
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=Josefin+Sans:wght@200;300;400;600&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=Josefin+Sans:wght@200;300;400;600&display=swap");
 ```
 
 - **Cormorant Garamond** — all serif headings and display text
@@ -431,13 +444,13 @@ Fonts are loaded via Google Fonts CDN inside a `<style>` tag in `App.jsx`. No ad
 
 The design uses a carefully considered palette. All colors are defined inline as Tailwind arbitrary values:
 
-| Token | Value | Usage |
-|-------|-------|-------|
-| Gold | `#c9a96e` / `text-amber-400` | Accents, headings, icons |
-| Cream | `#e8dcc8` / `text-[#e8dcc8]` | Primary body text |
-| Background | `#050301` / `bg-[#050301]` | Page background |
-| Glass panel | `bg-black/65` to `bg-black/70` | Frosted card backgrounds |
-| Border | `border-amber-400/10` to `border-amber-400/35` | Card and section borders |
+| Token       | Value                                          | Usage                    |
+| ----------- | ---------------------------------------------- | ------------------------ |
+| Gold        | `#c9a96e` / `text-amber-400`                   | Accents, headings, icons |
+| Cream       | `#e8dcc8` / `text-[#e8dcc8]`                   | Primary body text        |
+| Background  | `#050301` / `bg-[#050301]`                     | Page background          |
+| Glass panel | `bg-black/65` to `bg-black/70`                 | Frosted card backgrounds |
+| Border      | `border-amber-400/10` to `border-amber-400/35` | Card and section borders |
 
 <br />
 
@@ -447,11 +460,11 @@ The design uses a carefully considered palette. All colors are defined inline as
 
 ### Loading Strategy
 
-| Phase | What Loads | When |
-|-------|-----------|------|
-| Priority | Frames 072–120 (hero) | Immediately on mount |
-| Background | Frames 121–244 | After hero frames complete |
-| Fallback | Error frames are skipped | Silently, no crashes |
+| Phase      | What Loads               | When                       |
+| ---------- | ------------------------ | -------------------------- |
+| Priority   | Frames 072–120 (hero)    | Immediately on mount       |
+| Background | Frames 121–244           | After hero frames complete |
+| Fallback   | Error frames are skipped | Silently, no crashes       |
 
 ### Canvas Rendering Optimizations
 
@@ -471,6 +484,7 @@ npm run preview
 ```
 
 For the best performance in production:
+
 - Serve from a CDN (Vercel, Netlify, Cloudflare Pages all work perfectly)
 - Enable HTTP/2 on your server — this allows the browser to load multiple `.webp` frames in parallel
 - Set `Cache-Control: public, max-age=31536000, immutable` on the `/frames/` directory
@@ -495,10 +509,10 @@ Each section has a unique `id` and is registered in the `SECTIONS` array at the 
 
 ```js
 const SECTIONS = [
-  { id: "hero",        nav: "Home" },
-  { id: "story",       nav: "Our Story" },
+  { id: "hero", nav: "Home" },
+  { id: "story", nav: "Our Story" },
   // Add your section here:
-  { id: "gallery",     nav: "Gallery" },
+  { id: "gallery", nav: "Gallery" },
 ];
 ```
 
@@ -510,7 +524,7 @@ The easing factor `0.10` controls how quickly the canvas catches up to the targe
 
 ```js
 // In the RAF loop inside App.jsx
-currentFrameRef.current += diff * 0.10; // Change 0.10 to adjust feel
+currentFrameRef.current += diff * 0.1; // Change 0.10 to adjust feel
 //                                ↑
 //   0.05 = very slow, dreamy
 //   0.10 = default, cinematic
@@ -523,11 +537,20 @@ currentFrameRef.current += diff * 0.10; // Change 0.10 to adjust feel
 To make the background brighter or darker, change the opacity values on the three persistent overlay divs in `App.jsx`:
 
 ```jsx
-{/* Layer 1 — base dim: increase opacity to darken */}
-<div className="fixed inset-0 z-[1] bg-[rgba(3,1,0,0.52)] pointer-events-none" />
+{
+  /* Layer 1 — base dim: increase opacity to darken */
+}
+<div className="fixed inset-0 z-[1] bg-[rgba(3,1,0,0.52)] pointer-events-none" />;
 
-{/* Layer 2 — radial vignette: change 0.70 to adjust edge darkness */}
-<div style={{ background: "radial-gradient(ellipse at 50% 42%, transparent 28%, rgba(0,0,0,0.70) 100%)" }} />
+{
+  /* Layer 2 — radial vignette: change 0.70 to adjust edge darkness */
+}
+<div
+  style={{
+    background:
+      "radial-gradient(ellipse at 50% 42%, transparent 28%, rgba(0,0,0,0.70) 100%)",
+  }}
+/>;
 ```
 
 <br />
@@ -536,14 +559,14 @@ To make the background brighter or darker, change the opacity values on the thre
 
 ## 🌐 Browser Support
 
-| Browser | Support | Notes |
-|---------|---------|-------|
-| Chrome 80+ | ✅ Full | WebP + Canvas fully supported |
-| Firefox 75+ | ✅ Full | WebP + Canvas fully supported |
-| Safari 14+ | ✅ Full | WebP support added in Safari 14 |
-| Edge 80+ | ✅ Full | Chromium-based, full support |
+| Browser             | Support    | Notes                               |
+| ------------------- | ---------- | ----------------------------------- |
+| Chrome 80+          | ✅ Full    | WebP + Canvas fully supported       |
+| Firefox 75+         | ✅ Full    | WebP + Canvas fully supported       |
+| Safari 14+          | ✅ Full    | WebP support added in Safari 14     |
+| Edge 80+            | ✅ Full    | Chromium-based, full support        |
 | Safari 13 and below | ⚠️ Partial | No WebP support — frames won't load |
-| Internet Explorer | ❌ None | Not supported |
+| Internet Explorer   | ❌ None    | Not supported                       |
 
 > For Safari 13 and below, consider adding a fallback using a static background image when `Image.onerror` fires for the first frame.
 
@@ -577,12 +600,12 @@ No additional runtime libraries are required. The entire animation engine, easin
 
 ## 🗒 Scripts
 
-| Command | Description |
-|---------|-------------|
-| `npm run dev` | Start development server at `localhost:5173` |
-| `npm run build` | Build optimized production bundle to `/dist` |
-| `npm run preview` | Preview production build locally |
-| `npm run lint` | Run ESLint (if configured) |
+| Command           | Description                                  |
+| ----------------- | -------------------------------------------- |
+| `npm run dev`     | Start development server at `localhost:5173` |
+| `npm run build`   | Build optimized production bundle to `/dist` |
+| `npm run preview` | Preview production build locally             |
+| `npm run lint`    | Run ESLint (if configured)                   |
 
 <br />
 
@@ -607,6 +630,7 @@ npm run build
 ### Cloudflare Pages
 
 Connect your GitHub repository in the Cloudflare dashboard:
+
 - **Build command:** `npm run build`
 - **Build output directory:** `dist`
 - **Node version:** `18`
@@ -629,8 +653,8 @@ This project is released for personal and commercial use. Attribution appreciate
 
 **✦ LUMIÈRE ✦**
 
-*Built with React · Vite · Tailwind CSS · WebP · Canvas API*
+_Built with React · Vite · Tailwind CSS · WebP · Canvas API_
 
-*An experience beyond taste.*
+_An experience beyond taste._
 
 </div>
